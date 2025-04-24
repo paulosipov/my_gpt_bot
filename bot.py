@@ -1,16 +1,26 @@
+# bot.py  – минимальная версия: /start отвечает приветствием
+
+import os
 from telegram import Update
 from telegram.ext import (
     Application, CommandHandler, MessageHandler, ContextTypes, filters
 )
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Привет! Я GPT‑бот. Напиши вопрос — отвечу 😊")
+TOKEN = os.getenv("TELEGRAM_TOKEN")
+
+
+async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
+    """Ответ на команду /start и любые текстовые сообщения."""
+    await update.message.reply_text("Привет! Я живой на Render 🎉")
+
 
 def build_app() -> Application:
-    return (
-        Application.builder()
-        .token(context.bot_data["TELEGRAM_TOKEN"])   # мы передадим переменную в main.py
-        .build()
-        .add_handler(CommandHandler("start", start))
-        .add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, start))
-    )
+    """Создаёт и возвращает объект Telegram‑приложения."""
+    app = Application.builder().token(TOKEN).build()
+
+    # /start
+    app.add_handler(CommandHandler("start", start))
+    # любое текстовое сообщение
+    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, start))
+
+    return app
