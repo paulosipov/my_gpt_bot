@@ -1,0 +1,1 @@
+python\nfrom pydantic import BaseSettings, Field\n\nclass Settings(BaseSettings):\n telegram_token: str = Field(..., env=\"TELEGRAM_TOKEN\")\n openai_key: str = Field(..., env=\"OPENAI_API_KEY\")\n redis_url: str = Field(\"redis://redis:6379\", env=\"REDIS_URL\")\n model: str = \"gpt-4o-mini\"\n\nsettings = Settings()\n
