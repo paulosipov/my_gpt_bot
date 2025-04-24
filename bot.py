@@ -1,18 +1,31 @@
-import os
-import uvicorn
-from fastapi import FastAPI
+import logging
+from telegram import Update
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
-# Создание экземпляра приложения FastAPI
-fastapi_app = FastAPI()
+# Настройка логирования
+logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-@fastapi_app.get("/")
-async def read_root():
-    return {"message": "Hello World"}
+# Функция обработки команды start
+def start(update: Update, context: CallbackContext) -> None:
+    update.message.reply_text('Привет, мир!')
 
-# Получение порта из переменной окружения или установка по умолчанию
-port = int(os.getenv("PORT", 10000))  # Если переменная окружения PORT не найдена, то используем 10000
+def main():
+    # Твой токен
+    updater = Updater("7576203575:AAEp6cuj1K2RqMb1Fp7z0TC86mWxP3R5LjQ", use_context=True)
 
-if __name__ == "__main__":
-    print("🤖 Bot is starting...")
-    # Запуск приложения FastAPI с указанным портом и хостом
-    uvicorn.run(fastapi_app, host="0.0.0.0", port=port)
+    # Получаем диспатчер для обработки сообщений
+    dp = updater.dispatcher
+
+    # Обработчик команды /start
+    dp.add_handler(CommandHandler("start", start))
+
+    # Запускаем бота
+    updater.start_polling()
+
+    # Бот будет работать до тех пор, пока не будет прерван
+    updater.idle()
+
+if __name__ == '__main__':
+    main()
