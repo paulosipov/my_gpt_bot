@@ -1,7 +1,5 @@
 fastapi
-uvicorn[standard]
-python-telegram-bot==21.*
+python-telegram-bot==21.11
 openai>=1.13
-pydantic
-redis-om
+uvicorn[standard]
 python-dotenv
