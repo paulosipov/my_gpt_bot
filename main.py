@@ -1,20 +1,52 @@
+from fastapi import FastAPI
+from telegram import Update
+from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+import openai
 import os
-import uvicorn
-from fastapi import FastAPI, Request
-from bot import build_app          # ← обратите внимание: без .app
+from dotenv import load_dotenv
 
+load_dotenv()
+
+# Инициализация FastAPI
+app = FastAPI()
+
+# Установим ключ API для OpenAI
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+# Создание Telegram-приложения
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
+bot_app = Application.builder().token(TELEGRAM_TOKEN).build()
 
-fastapi_app = FastAPI()
-telegram_app = build_app()
-telegram_app.bot_data["TELEGRAM_TOKEN"] = TELEGRAM_TOKEN   # передаём токен
+# Функция ответа через ChatGPT
+async def ask_openai(question: str) -> str:
+    try:
+        response = openai.ChatCompletion.create(
+            model="gpt-3.5-turbo",  # или "gpt-4", если у тебя есть доступ
+            messages=[{"role": "user", "content": question}]
+        )
+        return response.choices[0].message["content"].strip()
+    except Exception as e:
+        return f"Ошибка: {str(e)}"
 
-@fastapi_app.post("/webhook")
-async def webhook(req: Request):
-    data = await req.json()
-    await telegram_app.initialize()
-    await telegram_app.process_update(data)
-    return {"ok": True}
+# Команда /start
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    await update.message.reply_text("Привет! Я GPT-бот. Напиши мне что-нибудь, и я отвечу.")
 
-if __name__ == "__main__":
-    uvicorn.run("main:fastapi_app", host="0.0.0.0", port=10000)
+# Ответ на текстовые сообщения
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user_input = update.message.text
+    reply = await ask_openai(user_input)
+    await update.message.reply_text(reply)
+
+# Роут для проверки состояния сервера
+@app.get("/")
+def read_root():
+    return {"status": "бот работает"}
+
+# Запуск Telegram-бота асинхронно
+@app.on_event("startup")
+async def startup_event():
+    bot_app.add_handler(CommandHandler("start", start))
+    bot_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    bot_app.run_polling()
+
