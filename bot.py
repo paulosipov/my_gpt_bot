@@ -1,26 +1,18 @@
-# bot.py  – минимальная версия: /start отвечает приветствием
-
 import os
-from telegram import Update
-from telegram.ext import (
-    Application, CommandHandler, MessageHandler, ContextTypes, filters
-)
+import uvicorn
+from fastapi import FastAPI
 
-TOKEN = os.getenv("TELEGRAM_TOKEN")
+# Создание экземпляра приложения FastAPI
+fastapi_app = FastAPI()
 
+@fastapi_app.get("/")
+async def read_root():
+    return {"message": "Hello World"}
 
-async def start(update: Update, ctx: ContextTypes.DEFAULT_TYPE):
-    """Ответ на команду /start и любые текстовые сообщения."""
-    await update.message.reply_text("Привет! Я живой на Render 🎉")
+# Получение порта из переменной окружения или установка по умолчанию
+port = int(os.getenv("PORT", 10000))  # Если переменная окружения PORT не найдена, то используем 10000
 
-
-def build_app() -> Application:
-    """Создаёт и возвращает объект Telegram‑приложения."""
-    app = Application.builder().token(TOKEN).build()
-
-    # /start
-    app.add_handler(CommandHandler("start", start))
-    # любое текстовое сообщение
-    app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, start))
-
-    return app
+if __name__ == "__main__":
+    print("🤖 Bot is starting...")
+    # Запуск приложения FastAPI с указанным портом и хостом
+    uvicorn.run(fastapi_app, host="0.0.0.0", port=port)
