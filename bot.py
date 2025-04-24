@@ -1,31 +1,20 @@
-import logging
-from telegram import Update
-from telegram.ext import Updater, CommandHandler, CallbackContext
+from telegram.ext import Application, CommandHandler
 
-# Настройка логирования
-logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-                    level=logging.INFO)
-logger = logging.getLogger(__name__)
+# Функция, которая будет вызываться при команде /start
+def start(update, context):
+    update.message.reply_text("Привет! Я твой бот!")
 
-# Функция обработки команды start
-def start(update: Update, context: CallbackContext) -> None:
-    update.message.reply_text('Привет, мир!')
-
+# Основная функция для настройки бота
 def main():
-    # Твой токен
-    updater = Updater("7576203575:AAEp6cuj1K2RqMb1Fp7z0TC86mWxP3R5LjQ", use_context=True)
+    # Инициализация приложения с токеном
+    application = Application.builder().token("7576203575:AAEp6cuj1K2RqMb1Fp7z0TC86mWxP3R5LjQ").build()
 
-    # Получаем диспатчер для обработки сообщений
-    dp = updater.dispatcher
-
-    # Обработчик команды /start
-    dp.add_handler(CommandHandler("start", start))
+    # Добавляем обработчик команды /start
+    application.add_handler(CommandHandler("start", start))
 
     # Запускаем бота
-    updater.start_polling()
+    application.run_polling()
 
-    # Бот будет работать до тех пор, пока не будет прерван
-    updater.idle()
-
-if __name__ == '__main__':
+# Проверка, что скрипт запускается напрямую
+if __name__ == "__main__":
     main()
