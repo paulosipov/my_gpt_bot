@@ -1,7 +1,7 @@
 fastapi
 uvicorn[standard]
 python-telegram-bot==21.*
-async-openai>=1.2
+openai>=1.13
 pydantic
 redis-om
 python-dotenv
