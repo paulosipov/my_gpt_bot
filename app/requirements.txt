@@ -1,1 +1,0 @@
-text\nfastapi\nuvicorn[standard]\npython-telegram-bot==21.*\nasync-openai>=1.2\npydantic\nredis-om\npython-dotenv\n
