@@ -8,5 +8,4 @@ app = FastAPI()
 def read_root():
     return {"message": "Бот работает и FastAPI тоже!"}
 
-# Запускаем бота параллельно
 threading.Thread(target=run_bot).start()
