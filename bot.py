@@ -12,12 +12,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("Привет, мир!")
 
 def run_bot():
-    token = os.getenv("BOT_TOKEN")
+    token = os.getenv("TELEGRAM_TOKEN")
     if not token:
-        raise Exception("BOT_TOKEN не найден в .env")
+        raise Exception("TELEGRAM_TOKEN не найден в .env")
 
     app = ApplicationBuilder().token(token).build()
-
     app.add_handler(CommandHandler("start", start))
 
     logging.info("Бот запущен...")
